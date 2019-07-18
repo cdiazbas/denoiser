@@ -1,6 +1,10 @@
 # Solar image denoising with convolutional neural networks
 
-We have designed a neural network that is capable of recovering weak signals under a complex noise corruption using deep-learning techniques.
+We have designed a neural network that is capable of recovering weak signals under a complex noise corruption using deep-learning techniques. It is described in the paper, that you can find in [https://arxiv.org/abs/XXXX](https://arxiv.org/abs/XXXXX).
+
+![example](docs/prediction_sst.png?raw=true "")
+**Figure 1** — Example of the neural applied to real data.
+
 
 ## Abstract
 

@@ -3,7 +3,6 @@ import platform
 import os
 import time
 import argparse
-# from astropy.io import fits
 import warnings
 with warnings.catch_warnings():
     warnings.filterwarnings("ignore",category=FutureWarning)
@@ -26,7 +25,6 @@ if reducecore:
     ncores = 2
     from keras import backend as K
     K.set_session(K.tf.Session(config=K.tf.ConfigProto(intra_op_parallelism_threads=ncores, inter_op_parallelism_threads=ncores)))
-
 
 
 class deep_network(object):
@@ -75,17 +73,17 @@ class deep_network(object):
         plt.subplot(131)
         plt.title('Stokes Q - Original')
         plt.imshow(ima,cmap='seismic',origin='lower',interpolation='None',vmin=-medio,vmax=+medio)
-        plt.minorticks_on(); plt.locator_params(axis='y', nbins=4)
+        plt.minorticks_on(); plt.locator_params(axis='y', nbins=4); plt.ylabel('Y [pixel]'); plt.xlabel('X [pixel]')
         plt.subplot(132)
         plt.title('Stokes Q - Output DNN')
         plt.imshow(out[0,:,:,0],cmap='seismic',vmin=-medio,vmax=+medio,origin='lower',interpolation='None')
-        plt.minorticks_on(); plt.locator_params(axis='y', nbins=4)
+        plt.minorticks_on(); plt.locator_params(axis='y', nbins=4); plt.xlabel('X [pixel]'); plt.tick_params(axis='y',labelleft=False)
         plt.subplot(133)
         plt.title('Difference')
         plt.imshow(ima-out[0,:,:,0],cmap='seismic',vmin=-medio,vmax=+medio,origin='lower',interpolation='None')        
-        plt.minorticks_on(); plt.locator_params(axis='y', nbins=4)
+        plt.minorticks_on(); plt.locator_params(axis='y', nbins=4); plt.xlabel('X [pixel]'); plt.tick_params(axis='y',labelleft=False)
         plt.savefig('docs/prediction'+str(self.number)+'.png',bbox_inches='tight')
-
+        plt.tight_layout()
         np.save('output/prediction_sst.npy',out[0,:,:,0])
 
 
@@ -98,19 +96,7 @@ if (__name__ == '__main__'):
     parser.add_argument('-m','--model', help='model', default='weights/network_sst')
     parsed = vars(parser.parse_args())
 
-    # f = fits.open(parsed['input'])
-    # dire = parsed['dir']
-    # print('Dir:'+dire)
-    # input_file = dire+'database_test.h5'
-    # f = h5py.File(input_file, 'r')
-    # ntx, nx, ny, nlambda = f['stokes'].shape
-    # nindex = 1
-    # imgs = f['stokes'][nindex:nindex+1,:,:,:].astype('float32')
-    # ntx, nx, ny, nq = f['cube'].shape        
-    # # salida = f['cube'][0:1,:,:,:].astype('float32')
-    # f.close()
-    # from train import generaflat
-    
+    # Example to clean
     imgs = np.load('example_sst.npy')
 
     out = deep_network(parsed['model'],parsed['output'],parsed['number'])
@@ -119,10 +105,6 @@ if (__name__ == '__main__'):
     # To avoid the TF_DeleteStatus message:
     # https://github.com/tensorflow/tensorflow/issues/3388
     ktf.clear_session()
-
-    # os.system('python3 plot3Ddef.py -dir '+dire)
-    # os.system('python3 plotError.py')
-
 
 
 

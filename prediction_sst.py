@@ -71,11 +71,11 @@ class deep_network(object):
         import matplotlib.pyplot as plt
         plt.figure(figsize=(12,6))
         plt.subplot(131)
-        plt.title('Stokes Q - Original')
+        plt.title('Original')
         plt.imshow(ima,cmap='seismic',origin='lower',interpolation='None',vmin=-medio,vmax=+medio)
         plt.minorticks_on(); plt.locator_params(axis='y', nbins=4); plt.ylabel('Y [pixel]'); plt.xlabel('X [pixel]')
         plt.subplot(132)
-        plt.title('Stokes Q - Output DNN')
+        plt.title('Output DNN')
         plt.imshow(out[0,:,:,0],cmap='seismic',vmin=-medio,vmax=+medio,origin='lower',interpolation='None')
         plt.minorticks_on(); plt.locator_params(axis='y', nbins=4); plt.xlabel('X [pixel]'); plt.tick_params(axis='y',labelleft=False)
         plt.subplot(133)
@@ -84,22 +84,23 @@ class deep_network(object):
         plt.minorticks_on(); plt.locator_params(axis='y', nbins=4); plt.xlabel('X [pixel]'); plt.tick_params(axis='y',labelleft=False)
         plt.savefig('docs/prediction'+str(self.number)+'.png',bbox_inches='tight')
         plt.tight_layout()
-        np.save('output/prediction_sst.npy',out[0,:,:,0])
+        np.save(self.output,out[0,:,:,0])
 
 
      
 if (__name__ == '__main__'):
 
     parser = argparse.ArgumentParser(description='Prediction')
-    parser.add_argument('-o','--output', help='output')
-    parser.add_argument('-n','--number', help='number',default='_sst')
+    parser.add_argument('-i','--input', help='input',default='example_sst.npy')
+    parser.add_argument('-o','--output', help='output',default='output/prediction_sst.npy')
+    parser.add_argument('-p','--picture', help='picture',default='_sst')
     parser.add_argument('-m','--model', help='model', default='weights/network_sst')
     parsed = vars(parser.parse_args())
 
     # Example to clean
-    imgs = np.load('example_sst.npy')
+    imgs = np.load(parsed['input'])
 
-    out = deep_network(parsed['model'],parsed['output'],parsed['number'])
+    out = deep_network(parsed['model'],parsed['output'],parsed['picture'])
     out.define_network(image=imgs)
     out.predict()
     # To avoid the TF_DeleteStatus message:

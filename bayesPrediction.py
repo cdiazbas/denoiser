@@ -86,7 +86,7 @@ class deep_network(object):
         plt.minorticks_on(); plt.locator_params(axis='y', nbins=4); plt.xlabel('X [pixel]'); plt.tick_params(axis='y',labelleft=False)
         plt.subplot(133)
         plt.title('Uncertainty')
-        plt.imshow(sigma_total[0,:,:,0]*1e3,cmap='gray_r',vmin=0.4,vmax=1.8,origin='lower',interpolation='None')        
+        plt.imshow(sigma_total[0,:,:,0]*1e3,cmap='gray_r',origin='lower',interpolation='None')        
         plt.minorticks_on(); plt.locator_params(axis='y', nbins=4); plt.xlabel('X [pixel]'); plt.tick_params(axis='y',labelleft=False)
         plt.savefig('docs/prediction'+str(self.number)+'.png',bbox_inches='tight')
 
@@ -113,7 +113,8 @@ if (__name__ == '__main__'):
     # https://github.com/tensorflow/tensorflow/issues/3388
     ktf.clear_session()
 
-    # python prediction_sst.py -i example_sst.npy -o output/prediction_sst.npy
+    # python bayesPrediction.py -i example_sst.npy -o output/prediction_bayes_sst.npy -m weights/sst_bayes
+    # python bayesPrediction.py -i example_synthetic.npy -o output/prediction_bayes_simulation.npy
 
 
 

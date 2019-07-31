@@ -35,11 +35,11 @@ def crisp_load(fname, verb = True):
 # K.set_session(K.tf.Session(config=K.tf.ConfigProto(intra_op_parallelism_threads=ncores, inter_op_parallelism_threads=ncores)))
 
 
-class enhance(object):
+class deep_network(object):
 
     def __init__(self, inputFile, depth, model, activation, output, number):
 
-# Only allocate needed memory
+        # Only allocate needed memory
         config = tf.ConfigProto()
         config.gpu_options.allow_growth=True
         session = tf.Session(config=config)
@@ -101,7 +101,7 @@ if (__name__ == '__main__'):
     parser.add_argument('-m','--model', help='model',  default='weights/network_sst')
     parser.add_argument('-c','--activation', help='Activation', choices=['relu', 'elu'], default='relu')
     # parser.add_argument('-a','--action', help='action', choices=['cube', 'movie'], default='cube')
-    parser.add_argument('-dir','--dir', help='dir', default='/scratch/carlos/REMPEL/')
+    parser.add_argument('-dir','--dir', help='dir', default='/scratch/')
     parsed = vars(parser.parse_args())
 
 
@@ -120,7 +120,7 @@ if (__name__ == '__main__'):
     nmapa = np.zeros((datos.shape[0],datos.shape[1],datos.shape[2],datos.shape[3],datos.shape[4]))
 
 
-    out = enhance('{0}'.format(parsed['input']), depth=int(parsed['depth']), model=parsed['model'], 
+    out = deep_network('{0}'.format(parsed['input']), depth=int(parsed['depth']), model=parsed['model'], 
                     activation=parsed['activation'], output=parsed['out'], number=parsed['number'])
 
     # Execute the network N times more:    

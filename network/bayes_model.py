@@ -19,7 +19,7 @@ from keras.layers import Lambda, Multiply, Add
 
 
 # ==================================================================================
-def model_regression_dropout_var(filtros, dropout_rate, l2_rate, activation='relu', n_filters=64, l2_reg=1e-12,
+def model_regression_dropout_var(filtros=32, dropout_rate=0.00, l2_rate=1e-8, activation='relu', n_filters=64, l2_reg=1e-12,
         input_channel_num=1, out_ch=1, start_ch=32, inc_rate=2., depth=2, 
         batchnorm=False, maxpool=True, upconv=True, residual=False,disableDo=False):
     # UNet: code from https://github.com/pietz/unet-keras

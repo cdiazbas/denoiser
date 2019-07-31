@@ -12,9 +12,10 @@ with warnings.catch_warnings():
 # To deactivate warnings: https://github.com/tensorflow/tensorflow/issues/7778
 os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
 
+import astroNN
 import tensorflow as tf
+import network.bayes_model as nn_model
 import keras.backend.tensorflow_backend as ktf
-import network.models as nn_model
 import matplotlib as mpl
 mpl.use('Agg')
 
@@ -48,7 +49,8 @@ class deep_network(object):
         self.image = image
         self.nx = image.shape[0]
         self.ny = image.shape[1]
-        self.model = nn_model.unet(start_ch=self.nfilter)
+        self.model, self.model_prediction, mse_lin_ext, mse_var_ext = nn_model.model_regression_dropout_var()
+
 
         print("Loading weights... {0}_weights.hdf5".format(self.network_type))
         self.model.load_weights("{0}_weights.hdf5".format(self.network_type))
@@ -60,41 +62,45 @@ class deep_network(object):
         input_validation = np.zeros((1,self.nx,self.ny,1), dtype='float32')
         input_validation[0,:,:,0] = self.image
 
+        # From our tests, the epistemic uncertainty is around one order of magnitude 
+        # smaller. Therefore, one could make a single forward pass of the network to 
+        # have a rough estimation of the total uncertainty (without the MonteCarlo). 
 
         start = time.time()
-        out = self.model.predict(input_validation)
+        result = np.array(self.model_prediction.predict(input_validation))
+        sigma_total = np.sqrt(np.exp(result[0]))
+        prediction = result[1]
         end = time.time()
         print("Prediction took {0:3.2} seconds...".format(end-start))        
         
-        ima = self.image
         medio = 3*2.6e-3
         import matplotlib.pyplot as plt
         plt.figure(figsize=(12,6))
         plt.subplot(131)
         plt.title('Original')
-        plt.imshow(ima,cmap='seismic',origin='lower',interpolation='None',vmin=-medio,vmax=+medio)
+        plt.imshow(imgs,cmap='seismic',origin='lower',interpolation='None',vmin=-medio,vmax=+medio)
         plt.minorticks_on(); plt.locator_params(axis='y', nbins=4); plt.ylabel('Y [pixel]'); plt.xlabel('X [pixel]')
         plt.subplot(132)
         plt.title('Output DNN')
-        plt.imshow(out[0,:,:,0],cmap='seismic',vmin=-medio,vmax=+medio,origin='lower',interpolation='None')
+        plt.imshow(prediction[0,:,:,0],cmap='seismic',vmin=-medio,vmax=+medio,origin='lower',interpolation='None')
         plt.minorticks_on(); plt.locator_params(axis='y', nbins=4); plt.xlabel('X [pixel]'); plt.tick_params(axis='y',labelleft=False)
         plt.subplot(133)
-        plt.title('Difference')
-        plt.imshow(ima-out[0,:,:,0],cmap='seismic',vmin=-medio,vmax=+medio,origin='lower',interpolation='None')        
+        plt.title('Uncertainty')
+        plt.imshow(sigma_total[0,:,:,0]*1e3,cmap='gray_r',vmin=0.4,vmax=1.8,origin='lower',interpolation='None')        
         plt.minorticks_on(); plt.locator_params(axis='y', nbins=4); plt.xlabel('X [pixel]'); plt.tick_params(axis='y',labelleft=False)
         plt.savefig('docs/prediction'+str(self.number)+'.png',bbox_inches='tight')
-        plt.tight_layout()
-        np.save(self.output,out[0,:,:,0])
+
+        np.save(self.output,result)
 
 
      
 if (__name__ == '__main__'):
 
     parser = argparse.ArgumentParser(description='Prediction')
-    parser.add_argument('-i','--input', help='input',default='example_sst.npy')
-    parser.add_argument('-o','--output', help='output',default='output/prediction_sst.npy')
-    parser.add_argument('-p','--picture', help='picture',default='_sst')
-    parser.add_argument('-m','--model', help='model', default='weights/network_sst')
+    parser.add_argument('-i','--input', help='input',default='example_synthetic.npy')
+    parser.add_argument('-o','--output', help='output',default='output/prediction_bayes_simulation.npy')
+    parser.add_argument('-p','--picture', help='picture',default='_bayes')
+    parser.add_argument('-m','--model', help='model', default='weights/simulation_bayes')
     parsed = vars(parser.parse_args())
 
     # Example to clean

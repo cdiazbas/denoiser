@@ -106,9 +106,10 @@ if (__name__ == '__main__'):
 
 
     dir0 = '/scratch/.../'
-    fname = dir0 + 'crispex.stokes....time_corrected{0}.fcube'
+    fname = dir0 + 'crispex.stokes....time_corrected{0}.fits'
 
-    datos = crisp_load(fname)
+    import mfits
+    datos = mfits.readfits(fname)
     nt,ns,nw,nx,ny = datos.shape
     datos = datos[:,:,:,:988,:944]
     print(datos.shape)
@@ -171,7 +172,8 @@ if (__name__ == '__main__'):
     # https://github.com/tensorflow/tensorflow/issues/3388
     ktf.clear_session()
 
-    crispy.save_lpcube(nmapa, 'test',sp=True)
+    # crispy.save_lpcube(nmapa, 'test',sp=True)
+    mfits.writefits('test.fits', nmapa)
 
 
 

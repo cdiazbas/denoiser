@@ -1,10 +1,12 @@
 from keras.layers import Dense
 from keras.models import Model, Sequential, Input
-from keras.layers import Dense, InputLayer, Dropout, Activation, regularizers
+from keras.layers import Dense, InputLayer, Dropout, Activation
 from keras import initializers
 from keras.optimizers import Adam
 from keras.backend import learning_phase, function
 import keras.backend as K
+import keras
+print(keras.__version__)
 
 # To get plot_model works, you need to install graphviz and pydot_ng
 from keras.utils import plot_model

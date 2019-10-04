@@ -1,4 +1,4 @@
-from keras.layers import Input, Conv2D, Activation, BatchNormalization, GaussianNoise, add, UpSampling2D, Dropout, Concatenate, Merge, MaxPooling2D
+from keras.layers import Input, Conv2D, Activation, BatchNormalization, GaussianNoise, add, UpSampling2D, Dropout, Concatenate, MaxPooling2D
 from keras.layers.merge import concatenate
 from keras.models import Model
 from keras.regularizers import l2
@@ -6,6 +6,15 @@ import tensorflow as tf
 from keras.engine.topology import Layer
 from keras.engine import InputSpec
 from keras.utils import conv_utils
+import keras.backend as K
+import keras
+
+from packaging import version
+if version.parse(keras.__version__) < version.parse("2.2.1"):
+    current_version = False
+    normdata = conv_utils.normalize_data_format
+else:
+    normdata = K.normalize_data_format
 
 # ==================================================================================
 def spatial_reflection_2d_padding(x, padding=((1, 1), (1, 1)), data_format=None):
@@ -46,7 +55,8 @@ class ReflectionPadding2D(Layer):
                  data_format=None,
                  **kwargs):
         super(ReflectionPadding2D, self).__init__(**kwargs)
-        self.data_format = conv_utils.normalize_data_format(data_format)
+        # self.data_format = conv_utils.normalize_data_format(data_format)
+        self.data_format = normdata(data_format)
         if isinstance(padding, int):
             self.padding = ((padding, padding), (padding, padding))
         elif hasattr(padding, '__len__'):
